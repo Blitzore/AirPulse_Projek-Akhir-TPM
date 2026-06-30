@@ -54,6 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Card(
+                color: const Color(0xFFF8F9FA),
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 child: Padding(
@@ -71,6 +72,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _nameController,
                           decoration: InputDecoration(
                             labelText: 'Nama Lengkap',
+                            filled: true,
+                            fillColor: Colors.transparent,
                             prefixIcon: const Icon(Icons.person_outline),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -81,6 +84,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _emailController,
                           decoration: InputDecoration(
                             labelText: 'Username',
+                            filled: true,
+                            fillColor: Colors.transparent,
                             prefixIcon: const Icon(Icons.person_outline),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -91,6 +96,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             labelText: 'Password',
+                            filled: true,
+                            fillColor: Colors.transparent,
                             prefixIcon: const Icon(Icons.lock_outline),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),

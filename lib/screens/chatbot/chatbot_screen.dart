@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Layar chatbot AI (AirBot) untuk konsultasi kualitas udara dan kesehatan.
 class ChatbotScreen extends StatefulWidget {
-  final String apiKey;
-  const ChatbotScreen({super.key, required this.apiKey});
+  const ChatbotScreen({super.key});
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
@@ -20,9 +20,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   @override
   void initState() {
     super.initState();
+    final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
     final model = GenerativeModel(
       model: 'gemini-flash-latest',
-      apiKey: widget.apiKey,
+      apiKey: apiKey,
       systemInstruction: Content.system(
         'Kamu adalah AirBot, asisten AI untuk aplikasi AirPulse. '
         'Secara default, jawablah menggunakan Bahasa Indonesia kecuali pengguna memakai bahasa lain. '

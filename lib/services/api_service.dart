@@ -33,7 +33,7 @@ class ApiService {
   static Future<Map<String, dynamic>?> getHourlyAQIForecast(double lat, double lon) async {
     final url = Uri.parse(
       'https://air-quality-api.open-meteo.com/v1/air-quality'
-      '?latitude=$lat&longitude=$lon&hourly=european_aqi&timezone=auto',
+      '?latitude=$lat&longitude=$lon&hourly=european_aqi&timezone=auto&forecast_days=4',
     );
     try {
       final response = await http.get(url);

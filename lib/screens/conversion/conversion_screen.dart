@@ -139,6 +139,7 @@ class _ConversionScreenState extends State<ConversionScreen> {
               child: ListView(
                 children: _currencyResults.entries.map((entry) {
                   return Card(
+                    color: Colors.white,
                     elevation: 1,
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     child: ListTile(
@@ -201,6 +202,7 @@ class _ConversionScreenState extends State<ConversionScreen> {
               final diffStr = diff > 0 ? '+$diff jam' : (diff < 0 ? '$diff jam' : 'Sama');
 
               return Card(
+                color: Colors.white,
                 elevation: 1,
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(

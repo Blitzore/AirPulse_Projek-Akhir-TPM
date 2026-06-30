@@ -230,6 +230,7 @@ class _MapScreenState extends State<MapScreen> {
           Positioned(
             top: 16, left: 16, right: 16,
             child: Card(
+              color: Colors.white,
               elevation: 8,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               child: Padding(

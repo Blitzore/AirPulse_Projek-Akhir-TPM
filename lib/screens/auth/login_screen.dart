@@ -105,6 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Card(
+                color: const Color(0xFFF8F9FA),
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                 child: Padding(
@@ -123,6 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _emailController,
                           decoration: InputDecoration(
                             labelText: 'Username',
+                            filled: true,
+                            fillColor: Colors.transparent,
                             prefixIcon: const Icon(Icons.person_outline),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -133,6 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             labelText: 'Password',
+                            filled: true,
+                            fillColor: Colors.transparent,
                             prefixIcon: const Icon(Icons.lock_outline),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -163,6 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               side: const BorderSide(color: Color(0xFF0077B6)),

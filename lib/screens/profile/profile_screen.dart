@@ -80,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Text('Keamanan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 8),
                   Card(
+                    color: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade200)),
                     child: SwitchListTile(
@@ -102,6 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const Text('Pengaturan Notifikasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                   const SizedBox(height: 8),
                   Card(
+                    color: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade200)),
                     child: Padding(
@@ -136,6 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     )
                   else
                     ..._history.map((h) => Card(
+                      color: Colors.white,
                       elevation: 0,
                       margin: const EdgeInsets.only(bottom: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade200)),
@@ -170,7 +173,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (_) => AlertDialog(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                           title: const Text('Saran & Kesan TPM', style: TextStyle(color: Color(0xFF0077B6))),
-                          content: const Text('Projek akhirnya menantang untuk dikerjakan, penuh struggle untuk mencapai final seperti sekarang'),
+                          content: const Text(
+                            '''
+Kesan untuk Mata Kuliah TPM:
+• Pembelajaran mata kuliah Teknologi Pemrograman Mobile (TPM) dikemas dengan sangat baik dan terstruktur, memberikan pemahaman praktis yang mendalam mengenai alur pengembangan aplikasi mobile dari tingkat dasar hingga integrasi tingkat lanjut.
+• Meskipun proyek akhir dan tugas-tugas yang diberikan memiliki kompleksitas yang tinggi dan menantang, hal ini justru memotivasi mahasiswa untuk belajar lebih cepat, adaptif, serta terlatih memecahkan masalah pemrograman secara sistematis.
+
+Saran untuk Mata Kuliah TPM:
+• Diharapkan ke depannya alokasi waktu presentasi proyek akhir dapat diatur dengan lebih proporsional dan terencana, agar setiap kelompok mahasiswa memiliki kesempatan yang merata untuk memaparkan hasil karyanya secara optimal.
+                            ''',
+                          ),
                           actions: [
                             TextButton(onPressed: () => Navigator.pop(context), child: const Text('Tutup', style: TextStyle(color: Color(0xFF0077B6)))),
                           ],
@@ -210,6 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildMenuItem({required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
     return Card(
+      color: Colors.white,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.shade200)),

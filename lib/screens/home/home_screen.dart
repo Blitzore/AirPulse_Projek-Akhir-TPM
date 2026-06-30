@@ -34,9 +34,39 @@ class _HomeScreenState extends State<HomeScreen> {
   int _shakeCount = 0;
 
   bool _isMoving = false;
-  DateTime? _firstHighMagTime;
-  DateTime _lastAccelTime = DateTime.now();
   DateTime _lastNotifTime = DateTime.now().subtract(const Duration(days: 1));
+
+  // --- ML K-Nearest Neighbors (KNN) Variables ---
+  final List<double> _magWindow = [];
+  final int _windowSize = 25; // Jumlah sampel untuk ekstraksi fitur
+  
+  // Dataset KNN: [Mean, Variance] -> Label (0: Diam/Santai, 1: Berolahraga/Lari)
+  final List<Map<String, dynamic>> _knnDataset = [
+    {'f': [9.8, 0.2], 'label': 0},
+    {'f': [9.8, 1.0], 'label': 0},
+    {'f': [10.5, 3.0], 'label': 0},
+    {'f': [11.5, 12.0], 'label': 1},
+    {'f': [13.0, 25.0], 'label': 1},
+    {'f': [15.0, 50.0], 'label': 1},
+  ];
+
+  // Algoritma KNN Sederhana
+  int _classifyActivity(double mean, double variance) {
+    List<Map<String, dynamic>> distances = [];
+    for (var data in _knnDataset) {
+      List<double> f = data['f'];
+      double d = sqrt(pow(mean - f[0], 2) + pow(variance - f[1], 2));
+      distances.add({'dist': d, 'label': data['label']});
+    }
+    distances.sort((a, b) => a['dist'].compareTo(b['dist']));
+    
+    // Ambil K=3 tetangga terdekat
+    int lariCount = 0;
+    for (int i = 0; i < 3; i++) {
+      if (distances[i]['label'] == 1) lariCount++;
+    }
+    return lariCount >= 2 ? 1 : 0;
+  }
 
   @override
   void initState() {
@@ -52,15 +82,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  /// Inisialisasi listener gyroscope (shake) dan accelerometer (deteksi lari).
+  /// Inisialisasi listener gyroscope (shake) dan accelerometer (deteksi lari dengan ML KNN).
   void _initSensors() {
     _gyroSub = gyroscopeEventStream().listen((event) {
-      if (event.x.abs() > 15.0 || event.y.abs() > 15.0 || event.z.abs() > 15.0) {
-        _shakeCount++;
-        if (_shakeCount >= 3) {
-          final now = DateTime.now();
-          if (now.difference(_lastShakeTime).inSeconds > 3) {
-            _lastShakeTime = now;
+      if (event.x.abs() > 4.0 || event.y.abs() > 4.0 || event.z.abs() > 4.0) {
+        final now = DateTime.now();
+        if (now.difference(_lastShakeTime).inSeconds > 2) {
+          _shakeCount = 0; // Reset jika terlalu lama tidak shake
+        }
+        if (now.difference(_lastShakeTime).inMilliseconds > 300) {
+          _shakeCount++;
+          _lastShakeTime = now;
+          if (_shakeCount >= 3) {
             _shakeCount = 0;
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sensor Gyro: Merefresh data...')));
@@ -77,43 +110,48 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           }
         }
-      } else {
-        Future.delayed(const Duration(seconds: 1), () => _shakeCount = 0);
       }
     });
 
     _accelSub = accelerometerEventStream().listen((event) async {
       double magnitude = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
-      final now = DateTime.now();
-      bool isCurrentlyMoving = _isMoving;
+      _magWindow.add(magnitude);
 
-      if (magnitude > 15.0) {
-        _lastAccelTime = now;
-        _firstHighMagTime ??= now;
-        if (now.difference(_firstHighMagTime!).inSeconds >= 5) {
-          isCurrentlyMoving = true;
+      if (_magWindow.length >= _windowSize) {
+        // Ekstraksi Fitur (Mean & Variance)
+        double sum = _magWindow.reduce((a, b) => a + b);
+        double mean = sum / _windowSize;
+        
+        double sqDiffSum = 0;
+        for (double m in _magWindow) {
+          sqDiffSum += pow(m - mean, 2);
         }
-      } else if (now.difference(_lastAccelTime).inSeconds > 1) {
-        _firstHighMagTime = null;
-        isCurrentlyMoving = false;
-      }
+        double variance = sqDiffSum / _windowSize;
 
-      if (isCurrentlyMoving != _isMoving) {
-        setState(() => _isMoving = isCurrentlyMoving);
-      }
+        // Prediksi menggunakan K-Nearest Neighbors (KNN)
+        int prediction = _classifyActivity(mean, variance);
+        bool isCurrentlyMoving = prediction == 1;
 
-      if (isCurrentlyMoving && aqiData?['current'] != null) {
-        int aqi = aqiData!['current']['european_aqi'] ?? 0;
-        final prefs = await SharedPreferences.getInstance();
-        double threshold = prefs.getDouble('aqi_threshold') ?? 60.0;
-        if (aqi > threshold && now.difference(_lastNotifTime).inSeconds > 60) {
-          _lastNotifTime = now;
-          NotificationService.showNotification(
-            id: 1,
-            title: 'Peringatan Polusi Udara!',
-            body: 'Anda terdeteksi berolahraga saat AQI buruk ($aqi > batas $threshold). Segera kurangi aktivitas di luar!',
-          );
+        if (isCurrentlyMoving != _isMoving) {
+          setState(() => _isMoving = isCurrentlyMoving);
         }
+
+        if (isCurrentlyMoving && aqiData?['current'] != null) {
+          int aqi = aqiData!['current']['european_aqi'] ?? 0;
+          final prefs = await SharedPreferences.getInstance();
+          double threshold = prefs.getDouble('aqi_threshold') ?? 60.0;
+          final now = DateTime.now();
+          if (aqi > threshold && now.difference(_lastNotifTime).inSeconds > 60) {
+            _lastNotifTime = now;
+            NotificationService.showNotification(
+              id: 1,
+              title: 'Peringatan Polusi Udara!',
+              body: 'Model ML mendeteksi aktivitas olahraga saat AQI buruk ($aqi > batas $threshold).',
+            );
+          }
+        }
+
+        _magWindow.clear(); // Reset window untuk ekstraksi fitur selanjutnya
       }
     });
   }
@@ -175,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (_) => ChatbotScreen(apiKey: apiKey)));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatbotScreen()));
   }
 
   @override
